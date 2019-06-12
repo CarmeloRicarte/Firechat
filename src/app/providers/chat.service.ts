@@ -5,7 +5,8 @@ import {Mensaje} from '../interface/mensaje.interface';
 
 
 import { AngularFireAuth } from '@angular/fire/auth';
-import { auth } from 'firebase/app';
+import * as firebase from 'firebase';
+import {map} from 'rxjs/operators';
 
 
 @Injectable()
@@ -57,7 +58,7 @@ export class ChatService {
       .limit(5));
 
     return this.itemsCollection.valueChanges()
-      .map((mensajes: Mensaje[]) => {
+      .pipe(map((mensajes: Mensaje[]) => {
         console.log(mensajes);
 
         this.chats = [];
@@ -67,20 +68,16 @@ export class ChatService {
         }
 
         return this.chats;
-      });
-
-
+      }));
   }
 
 
   agregarMensaje(texto: string) {
-
-    // TODO falta el UID del usuario
     let mensaje: Mensaje = {
       nombre: this.usuario.nombre,
       mensaje: texto,
       fecha: new Date().getTime(),
-      uid: this.usuario.uid
+      uid: this.usuario.uid,
     };
 
     return this.itemsCollection.add(mensaje);
